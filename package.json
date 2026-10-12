@@ -1,0 +1,16 @@
+{
+  "name": "last-light-online",
+  "version": "9.0.0",
+  "private": true,
+  "description": "Last Light browser game and authenticated matchmaking service",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
