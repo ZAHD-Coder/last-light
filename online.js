@@ -1,6 +1,7 @@
 (() => {
   const SUPABASE_URL = 'https://yzhjovdrrulkvwzycocq.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_9oDrdcLvRbDHivgFO3xGgw_PVtIdZKY';
+  const MATCH_SERVER_URL = 'wss://last-light-production-f590.up.railway.app/ws';
   const PROFILE_TABLE = 'profiles';
   const SESSION_KEY = 'lastlight-online-session';
   const $ = id => document.getElementById(id);
@@ -130,7 +131,7 @@
   }
   function findMatch() {
     if (!session?.access_token) { showMatchStatus('Sign in before joining matchmaking.', true); return; }
-    const endpoint = $('wsEndpoint').value.trim() || localStorage.getItem('lastLightWsEndpoint') || '';
+    const endpoint = $('wsEndpoint').value.trim() || MATCH_SERVER_URL;
     if (!endpoint) { showMatchStatus('Enter your Render WebSocket URL (wss://…/ws) first.', true); return; }
     let url;
     try { url = new URL(endpoint); } catch { showMatchStatus('That WebSocket URL is invalid.', true); return; }
@@ -217,7 +218,7 @@
     const leaderboardOpen = !$('onlineLeaderboardView').classList.contains('hidden') && !panel.classList.contains('hidden');
     if (leaderboardOpen && session?.access_token) loadLeaderboard();
   }, 30000);
-  $('wsEndpoint').value = localStorage.getItem('lastLightWsEndpoint') || '';
+  $('wsEndpoint').value = MATCH_SERVER_URL;
   document.addEventListener('keydown', event => { if (event.key === 'Escape') panel.classList.add('hidden'); });
 
   try {
