@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0a20" />
+    <title>Last Light — Version 9.0</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles-v8.css" />
+    <link rel="stylesheet" href="styles-v9.css" />
+  </head>
+  <body>
+    <main id="app" class="app-shell">
+      <section id="menuScreen" class="screen menu-screen">
+        <div class="menu-glow"></div>
+        <div class="menu-demo" aria-hidden="true"><div class="demo-path"></div><div class="demo-turret"><i></i></div><div class="demo-target"></div><span class="demo-shot shot-one"></span><span class="demo-shot shot-two"></span><span class="demo-scan"></span></div>
+        <div class="brand-mark">✦ LAST LIGHT <span>BASE DEFENSE · V9.0</span></div>
+        <div class="hero-copy">
+          <p class="eyebrow">THE LAST OUTPOST · SECTOR 07</p>
+          <h1>Hold the line.<br /><span>Keep the light.</span></h1>
+          <p class="hero-description">Build your defenses in the breach. The swarm is coming from the north.</p>
+          <div class="menu-actions">
+            <button id="playButton" class="button button-primary">PLAY <span>→</span></button>
+            <button id="accountButton" class="button button-ghost">LOCAL PROFILE</button>
+            <button id="onlineAccountButton" class="button button-ghost">ONLINE ACCOUNT</button>
+            <button id="helpButton" class="button button-ghost">HOW TO PLAY</button>
+          </div>
+          <p id="profileSummary" class="profile-summary">Offline progress is saved on this device.</p>
+        </div>
+        <div class="menu-bottom"><span>11 × 11 GRID</span><span>·</span><span>ENDLESS WAVES</span><span>·</span><span>NO SAFE CORNERS</span></div>
+        <div id="accountPanel" class="account-panel hidden" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+          <button class="close-button" id="closeAccount" aria-label="Close profile">×</button>
+          <p class="eyebrow">LOCAL SAVE · THIS DEVICE</p><h2 id="accountTitle">Player profile</h2>
+          <p class="account-copy">Create or load an offline profile. Progress is stored locally in this browser; no network account or password is sent.</p>
+          <label for="profileName">CALLSIGN</label><input id="profileName" maxlength="24" autocomplete="nickname" placeholder="e.g. StarPilot">
+          <button id="saveProfile" class="button button-primary" type="button">SAVE PROFILE <span>→</span></button>
+          <p id="profileStats" class="profile-stats">Victories: 0 · World 2 locked</p>
+        </div>
+        <section id="onlinePanel" class="online-panel hidden" role="dialog" aria-modal="true" aria-labelledby="onlineTitle">
+          <button class="close-button" id="closeOnline" aria-label="Close online account">×</button>
+          <p class="eyebrow">ONLINE SERVICES · ACCOUNT & RANKINGS</p>
+          <h2 id="onlineTitle">Commander access</h2>
+          <p id="onlineStatus" class="online-status" aria-live="polite">Sign in or create an account to load your online profile.</p>
+          <form id="onlineAuthForm" class="online-auth-form">
+            <label for="onlineUsername">CALLSIGN <span>(registration only)</span></label>
+            <input id="onlineUsername" maxlength="24" autocomplete="nickname" placeholder="StarPilot">
+            <label for="onlineEmail">EMAIL</label>
+            <input id="onlineEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+            <label for="onlinePassword">PASSWORD</label>
+            <input id="onlinePassword" type="password" minlength="8" autocomplete="current-password" required placeholder="At least 8 characters">
+            <div class="online-auth-actions"><button class="button button-primary" id="onlineSubmit" type="submit">SIGN IN <span>→</span></button><button class="button button-ghost" id="onlineModeToggle" type="button">CREATE ACCOUNT</button></div>
+          </form>
+          <div id="onlineSignedIn" class="online-signed-in hidden">
+            <div class="online-stats"><span>CALLSIGN<b id="onlineCallsign">—</b></span><span>WINS<b id="onlineWins">0</b></span><span>LOSSES<b id="onlineLosses">0</b></span><span>ELO<b id="onlineElo">1000</b></span></div>
+            <div class="online-tabs" role="tablist"><button type="button" class="online-tab active" data-online-tab="profile">PROFILE</button><button type="button" class="online-tab" data-online-tab="leaderboard">LEADERBOARD</button></div>
+            <div id="onlineProfileView" class="online-view"><label for="wsEndpoint">MATCH SERVER · WSS URL</label><input id="wsEndpoint" type="url" placeholder="wss://your-render-service.onrender.com/ws"><div class="online-auth-actions"><button id="findMatchButton" class="button button-primary" type="button">FIND 1V1 MATCH</button><button id="cancelMatchButton" class="button button-ghost hidden" type="button">CANCEL SEARCH</button></div><p id="matchStatus" class="online-status">No match search is active.</p><button id="onlineSignOut" class="button button-ghost" type="button">SIGN OUT</button></div>
+            <div id="onlineLeaderboardView" class="online-view hidden"><div id="onlineLeaderboard" class="online-leaderboard">Leaderboard not loaded yet.</div><button id="refreshLeaderboard" class="button button-ghost" type="button">REFRESH</button></div>
+          </div>
+          <p class="online-footnote">Your password is sent only to Supabase Auth over HTTPS. Never put a Supabase service-role key in browser code.</p>
+        </section>
+        <div id="difficultyPanel" class="difficulty-panel hidden">
+          <button class="close-button" id="closeDifficulty" aria-label="Close">×</button>
+          <p class="eyebrow">CHOOSE YOUR CHALLENGE</p><h2>How long can you last?</h2>
+          <div class="difficulty-options">
+            <button class="difficulty-card" data-difficulty="Easy"><span>01</span><b>Easy</b><small>More credits · Slower swarm</small></button>
+            <button class="difficulty-card" data-difficulty="Medium"><span>02</span><b>Medium</b><small>A fair fight · Standard pace</small></button>
+            <button class="difficulty-card" data-difficulty="Hard"><span>03</span><b>Hard</b><small>Less cash · No mercy</small></button>
+          </div>
+          <div class="world-choice" aria-label="Choose campaign world">
+            <span>CAMPAIGN WORLD</span>
+            <button type="button" class="world-choice-button active" data-world="1">WORLD 1 · WAVES 1–150</button>
+            <button type="button" class="world-choice-button" data-world="2" disabled>WORLD 2 · LOCKED</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="game-screen hidden">
+        <div class="space-backdrop" aria-hidden="true"><i class="flyby-ship"></i><i class="flyby-meteor"></i></div>
+        <header class="topbar">
+          <a class="game-brand" href="#" id="homeButton"><span>✦</span> LAST LIGHT <small>SECTOR 07</small></a>
+          <div class="hud-stats">
+            <div class="stat credits-stat"><span class="stat-icon">✦</span><div><small>CREDITS</small><b id="creditsValue">0</b></div></div>
+            <div class="stat"><span class="stat-icon heart">♥</span><div><small>BASE HP</small><b id="baseValue">0 / 0</b></div></div>
+            <div class="stat"><span class="stat-icon wave-icon">◉</span><div><small>WAVE</small><b id="waveValue">0</b></div></div>
+          </div>
+          <div class="header-tools"><button id="graphicsButton" class="icon-button graphics-button" title="Graphics settings" aria-label="Graphics settings">⚙</button><button id="soundButton" class="icon-button" title="Sound effects on" aria-label="Toggle sound">♫</button></div>
+        </header>
+        <div id="settingsBackdrop" class="settings-backdrop hidden"></div>
+        <div id="graphicsPanel" class="graphics-panel hidden" role="dialog" aria-modal="true" aria-label="Graphics settings"><button class="close-button" id="closeGraphics" aria-label="Close graphics settings">×</button><p class="eyebrow">DISPLAY OPTIONS</p><h2>Graphics settings</h2><label for="graphicsSelect">GRAPHICS QUALITY</label><select id="graphicsSelect"><option value="potato">Potato Mode</option><option value="low">Low</option><option value="standard" selected>Standard</option><option value="fast">Fast</option><option value="high">High</option><option value="fancy">Fancy</option></select><small>Lower settings reduce visual effects for smoother play.</small></div>
+        <div class="game-layout">
+          <section class="battle-panel">
+            <div class="battle-heading"><div><p class="eyebrow">NORTH GATE · INCOMING THREAT</p><h2 id="battleTitle">The breach is quiet... for now.</h2></div><span id="threatBadge" class="threat-badge">PREPARE</span></div>
+            <div class="battle-board-wrap"><div class="north-label"><span>▲</span> ENEMY ENTRY ZONE</div><div id="board" class="board" aria-label="11 by 11 defense grid"><canvas id="battleCanvas" aria-hidden="true"></canvas></div><div class="south-label"><span>◆</span> LAST LIGHT COMMAND</div></div>
+            <div class="battle-footer"><span id="messageText">Select an item, then place it on the grid.</span><div class="battle-controls"><button id="clearSelection" class="small-button">CANCEL SELECT</button><button id="speedButton" class="small-button speed-button" aria-pressed="false">1× SPEED</button><button id="autoWaveButton" class="small-button auto-wave-button" aria-pressed="false">AUTO WAVE: OFF</button><button id="waveButton" class="button button-primary wave-button">START WAVE <span>→</span></button></div></div>
+          </section>
+          <aside class="shop-panel">
+            <div class="shop-header"><div><p class="eyebrow">OUTPOST LOADOUT</p><h2>Field shop</h2></div><span class="shop-count">186 ITEMS</span></div>
+            <div class="shop-tabs" role="tablist"><button class="shop-tab active" data-category="defense">Defense <span>78</span></button><button class="shop-tab" data-category="blocks">Blocks <span>65</span></button><button class="shop-tab" data-category="traps">Traps <span>20</span></button><button class="shop-tab" data-category="decoration">Decor <span>15</span></button><button class="shop-tab" data-category="permanent">Abilities <span>8</span></button></div>
+            <div class="shop-note" id="shopNote">Defenses fire automatically and can be destroyed.</div>
+            <div id="shopItems" class="shop-items"></div>
+            <div id="abilityButtons" class="ability-buttons hidden" aria-label="Unlocked abilities"></div>
+            <div class="selected-card" id="selectedCard"><span class="selected-icon">＋</span><div><small>PLACEMENT</small><b id="selectedName">Choose an item</b><span id="selectedDescription">Your outpost needs you.</span></div></div>
+            <div id="turretActions" class="turret-actions hidden"><div class="turret-action-info"><small>SELECTED DEFENSE</small><b id="turretActionName">Turret</b><span id="turretActionStats">Level 1 · 0 HP</span></div><div class="turret-action-buttons"><button id="upgradeTurretButton" class="small-button upgrade-button">UPGRADE · ◈ 0</button><button id="sellTurretButton" class="small-button sell-button">SELL · ◈ 0</button></div></div>
+            <div class="shop-legend"><span><i class="legend-dot defense-dot"></i>Defense</span><span><i class="legend-dot block-dot"></i>Block</span><span><i class="legend-dot trap-dot"></i>Trap</span><span><i class="legend-dot decor-dot"></i>Decor</span></div>
+          </aside>
+        </div>
+        <footer class="game-footer"><span>✦ SURVIVE THE SWARM. PROTECT THE CORE.</span><span id="difficultyLabel">MEDIUM</span></footer>
+      </section>
+
+      <div id="helpModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+        <div class="modal-card"><button id="closeHelp" class="close-button" aria-label="Close">×</button><p class="eyebrow">FIELD MANUAL</p><h2 id="helpTitle">How to play</h2><ul class="help-list"><li><span>01</span><div><b>Build your line</b><p>Choose an item in the shop, then click an open tile. You can seal every entrance; enemies will breach barriers instead of getting stuck.</p></div></li><li><span>02</span><div><b>Build and improve</b><p>Turrets fire automatically and can be destroyed. Blocks and traps can also take damage; destroyed structures return after a wave. Traps hit harder and can burn, poison, stun, or slow enemies. Drag across the grid or Ctrl-click to select multiple structures, then bulk upgrade or sell them. Upgrade the Command Core up to Level 50—advanced turrets unlock from Core Level 11.</p></div></li><li><span>03</span><div><b>Hold your ground</b><p>Earn credits for every enemy defeated. Wave payouts grow from one wave to the next, and surviving repairs your base a little.</p></div></li><li><span>04</span><div><b>Control the battle</b><p>Bosses arrive every 10th wave; super-mega bosses attack every 50 waves, and the Ultimate Last Boss arrives at wave 150. Clear the wave before a boss for a preparation bonus. Cycle speed up to 35×; the traveling Black Market offers 50×–100× boosts, exclusive defenses, and abilities for Light Tokens exchanged at 1 billion credits each. Adjust graphics for your device, unlock abilities, then activate them from the controls beneath the item list.</p></div></li></ul><button id="helpPlayButton" class="button button-primary modal-play">GOT IT <span>→</span></button></div>
+      </div>
+      <div id="bossAnnouncement" class="boss-announcement" aria-live="assertive"><span class="boss-kicker">THREAT LEVEL · CRITICAL</span><strong id="bossName">BOSS INCOMING</strong><span class="boss-subtitle">ALL DEFENSES · ENGAGE</span></div>
+      <div id="bossCutscene" class="boss-cutscene" aria-hidden="true"><div class="cutscene-kicker">SECTOR 07 · BOSS ENGAGEMENT</div><div class="cutscene-stage"><div class="cutscene-turret">✦</div><div class="cutscene-beam"></div><div class="cutscene-boss">☠</div><div class="cutscene-impact">✦</div></div><strong id="cutsceneBossName">BOSS INCOMING</strong><span class="cutscene-caption">TARGET ACQUIRED · FIRE!</span></div>
+      <div id="cashToast" class="cash-toast" aria-live="polite"></div>
+      <div id="abilityFlash" class="ability-flash" aria-hidden="true"><span>✦</span><b id="abilityFlashLabel">ABILITY DEPLOYED</b></div>
+      <button id="merchantButton" class="merchant-button hidden" type="button" aria-label="Open traveling black market"><span class="merchant-clock">◷</span><span>BLACK MARKET</span><b id="merchantButtonTimer">--:--</b></button>
+      <div id="merchantOverlay" class="merchant-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="merchantTitle">
+        <section class="merchant-card"><button id="closeMerchant" class="close-button" aria-label="Close black market">×</button><p class="eyebrow">UNREGISTERED TRADER · LIMITED WINDOW</p><h2 id="merchantTitle">The Black Market</h2><p class="merchant-intro">Stock is scarce. When the trader leaves, the offers change.</p><div class="merchant-status"><span>⏱ VISITOR DEPARTS IN</span><strong id="merchantTimer">02:00</strong><span class="merchant-currency">✧ LIGHT TOKENS <b id="lightTokens">0</b></span></div><button id="exchangeButton" class="merchant-exchange" type="button">EXCHANGE 1,000,000,000 CREDITS → 1 LIGHT TOKEN</button><div id="merchantItems" class="merchant-items"></div><small class="merchant-footnote">Token exchange is permanent. Merchant purchases are one-time stock items.</small></section>
+      </div>
+      <div id="endModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card end-card"><p class="eyebrow">CORE DESTROYED</p><h2>GAME OVER</h2><p id="endSummary">Your team held the line.</p><button id="retryButton" class="button button-primary">RESTART <span>↻</span></button></div></div>
+      <div id="victoryCutscene" class="victory-cutscene" aria-hidden="true"><span>SECTOR 07 · FINAL ENGAGEMENT</span><strong>CHECKMATE</strong><i></i><small>THE ULTIMATE LAST BOSS HAS BEEN DEFEATED</small></div>
+      <div id="victoryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="victoryTitle"><div class="modal-card victory-card"><p class="eyebrow">CAMPAIGN COMPLETE · WORLD 1 · WAVE 150</p><h2 id="victoryTitle">YOU SAVED THE WORLD</h2><p>World 2 awaits. Your victory will unlock it for your local profile.</p><button id="worldTwoRestart" class="button button-primary">ENTER WORLD 2 <span>→</span></button></div></div>
+      <div id="deploymentIntro" class="deployment-intro" aria-hidden="true"><span>SECTOR 07 · DEFENSE NETWORK ONLINE</span><strong id="introDifficulty">MEDIUM OPERATION</strong><i></i><small>DEPLOYING COMMAND GRID</small></div>
+    </main>
+    <script src="script.js"></script>
+    <script>
+      (() => {
+        const app = document.getElementById('app');
+        const button = document.getElementById('graphicsButton');
+        const panel = document.getElementById('graphicsPanel');
+        const select = document.getElementById('graphicsSelect');
+        const speedButton = document.getElementById('speedButton');
+        const speeds = [1, 2, 5, 10, 20, 25, 35, 50, 75, 100];
+        let speedIndex = 0;
+        const applyGraphics = value => {
+          app.dataset.graphics = value;
+          select.value = value;
+          try { localStorage.setItem('lastLightGraphics', value); } catch {}
+        };
+        try { applyGraphics(localStorage.getItem('lastLightGraphics') || 'standard'); }
+        catch { applyGraphics('standard'); }
+        const settingsBackdrop = document.getElementById('settingsBackdrop');
+        const closeGraphics = document.getElementById('closeGraphics');
+        const closeSettings = () => { panel.classList.add('hidden'); settingsBackdrop.classList.add('hidden'); };
+        button.addEventListener('click', () => {
+          const opening = panel.classList.contains('hidden');
+          panel.classList.toggle('hidden', !opening);
+          settingsBackdrop.classList.toggle('hidden', !opening);
+        });
+        closeGraphics.addEventListener('click', closeSettings);
+        settingsBackdrop.addEventListener('click', closeSettings);
+        select.addEventListener('change', () => applyGraphics(select.value));
+        document.addEventListener('click', event => {
+          if (!panel.contains(event.target) && !button.contains(event.target)) closeSettings();
+        });
+        speedButton.addEventListener('click', event => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          speedIndex = (speeds.indexOf(speedMultiplier) + 1) % speeds.length;
+          speedMultiplier = speeds[speedIndex];
+          speedButton.textContent = `${speedMultiplier}× SPEED`;
+          speedButton.classList.toggle('active', speedMultiplier > 1);
+          speedButton.setAttribute('aria-pressed', String(speedMultiplier > 1));
+        }, true);
+        document.addEventListener('keydown', event => {
+          if (event.key === 'Escape') closeSettings();
+        });
+      })();
+    </script>
+    <script>
+      (() => {
+        const merchant = document.getElementById('merchantButton');
+        const overlay = document.getElementById('merchantOverlay');
+        const stockNode = document.getElementById('merchantItems');
+        const tokenNode = document.getElementById('lightTokens');
+        const timerNode = document.getElementById('merchantTimer');
+        const buttonTimer = document.getElementById('merchantButtonTimer');
+        const offers = [
+          {id:'sunlance',name:'Sunlance Interceptor',type:'turret',tokens:2,damage:1450,range:14,detail:'Piercing beam · exclusive turret'},
+          {id:'riftcannon',name:'Rift Cannon',type:'turret',tokens:4,damage:4200,range:17,detail:'Gravity burst · exclusive turret'},
+          {id:'warden',name:'Eclipse Warden',type:'turret',tokens:8,damage:14000,range:20,detail:'Heavy area fire · exclusive turret'},
+          {id:'novaAbility',name:'Nova Cataclysm',type:'ability',tokens:3,detail:'Unlock grid-wide 9,000 damage strike'},
+          {id:'speed50',name:'Overdrive · 50×',type:'speed',tokens:1,speed:50,detail:'Battle speed boost'},
+          {id:'speed75',name:'Overdrive · 75×',type:'speed',tokens:2,speed:75,detail:'Battle speed boost'},
+          {id:'speed100',name:'Overdrive · 100×',type:'speed',tokens:4,speed:100,detail:'Maximum merchant speed boost'},
+          {id:'speed125',name:'Overdrive · 125×',type:'speed',tokens:5,speed:125,detail:'Extreme merchant speed boost'},
+          {id:'speed150',name:'Overdrive · 150×',type:'speed',tokens:7,speed:150,detail:'Extreme merchant speed boost'},
+          {id:'speed300',name:'Overdrive · 300×',type:'speed',tokens:12,speed:300,detail:'Maximum speed · short reaction window'}
+        ];
+        let lightTokens = 0;
+        let visitEndsAt = 0;
+        let leavesAt = 0;
+        let stock = [];
+        try { lightTokens = Number(localStorage.getItem('lastLightTokens')) || 0; } catch {}
+        const saveTokens = () => { tokenNode.textContent = lightTokens.toLocaleString(); try { localStorage.setItem('lastLightTokens', String(lightTokens)); } catch {} };
+        const formatTime = seconds => `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+        function refreshStock() {
+          offers.forEach(item => { item.sold = false; });
+          stock = offers.filter(() => Math.random() < .68).sort(() => Math.random() - .5).slice(0,4);
+          if (!stock.some(item => item.type === 'speed')) { const speedOffers=offers.filter(item=>item.type==='speed'); stock.push(speedOffers[Math.floor(Math.random()*speedOffers.length)]); }
+          drawStock();
+        }
+        function drawStock() {
+          stockNode.innerHTML = stock.map(item => `<article class="merchant-item"><div><b>${item.name}</b><small>${item.detail}</small></div><button type="button" data-offer="${item.id}" ${item.sold?'disabled':''}>${item.sold?'SOLD OUT':`BUY · ✧ ${item.tokens}`}</button></article>`).join('');
+        }
+        function visit() {
+          if (document.getElementById('gameScreen').classList.contains('hidden')) { setTimeout(visit, 10000); return; }
+          visitEndsAt = Date.now() + 120000;
+          merchant.classList.remove('hidden');
+          refreshStock();
+        }
+        function setSpeed(value) {
+          speedMultiplier = value;
+          const speedButton = document.getElementById('speedButton');
+          speedButton.textContent = `${value}× SPEED`;
+          speedButton.classList.toggle('active', value > 1);
+          speedButton.setAttribute('aria-pressed', String(value > 1));
+        }
+        document.getElementById('merchantButton').addEventListener('click', () => overlay.classList.remove('hidden'));
+        document.getElementById('closeMerchant').addEventListener('click', () => overlay.classList.add('hidden'));
+        overlay.addEventListener('click', event => { if (event.target === overlay) overlay.classList.add('hidden'); });
+        document.getElementById('exchangeButton').addEventListener('click', () => {
+          if (credits < 1000000000) { setMessage('The trader requires 1,000,000,000 credits for one Light Token.'); return; }
+          credits -= 1000000000; lightTokens++; saveTokens(); updateHud(); showCash(-1000000000, 'CASH EXCHANGED');
+          setMessage('Exchanged 1,000,000,000 credits for 1 Light Token.');
+        });
+        stockNode.addEventListener('click', event => {
+          const button = event.target.closest('[data-offer]'); if (!button) return;
+          const item = stock.find(offer => offer.id === button.dataset.offer);
+          if (!item || item.sold) return;
+          if (lightTokens < item.tokens) { setMessage('Not enough Light Tokens for this black market offer.'); return; }
+          lightTokens -= item.tokens; item.sold = true; saveTokens();
+          if (item.type === 'turret') {
+            selectedTurret = null;
+            selected = {id:`black-market-${item.id}`,name:item.name,cost:0,marketValue:1,category:'defense',damage:item.damage,range:item.range,hp:item.damage};
+            document.getElementById('selectedName').textContent = `${item.name} acquired`;
+            document.getElementById('selectedDescription').textContent = 'Exclusive defense · click an empty tile to deploy.';
+            document.getElementById('selectedCard').querySelector('.selected-icon').textContent = '✧';
+            setMessage(`${item.name} acquired · choose an open tile to deploy it.`); renderBoard();
+          } else if (item.type === 'ability') {
+            if (!abilities.some(ability => ability.name === 'Nova Cataclysm')) abilities.push({name:'Nova Cataclysm',cost:0,damage:9000,cooldown:90000,radius:99,detail:'9,000 DAMAGE · GRIDWIDE NOVA'});
+            unlockedAbilities.add('Nova Cataclysm'); abilityReadyAt['Nova Cataclysm'] = 0; updateAbilityButtons();
+            setMessage('Nova Cataclysm unlocked · activate it beneath the shop.');
+          } else {
+            setSpeed(item.speed); setMessage(`Black market overdrive engaged · ${item.speed}× speed.`);
+          }
+          drawStock();
+        });
+        document.getElementById('merchantButton').addEventListener('animationend', () => {});
+        saveTokens();
+        setTimeout(visit, 45000);
+        setInterval(() => {
+          const now = Date.now();
+          if (now >= visitEndsAt) {
+            visitEndsAt = 0; merchant.classList.add('hidden'); overlay.classList.add('hidden');
+            if (!leavesAt) leavesAt = now + 45000;
+            if (now >= leavesAt) { leavesAt = 0; visit(); }
+          }
+          if (visitEndsAt) {
+            const left = Math.max(0, Math.ceil((visitEndsAt-now)/1000));
+            timerNode.textContent = formatTime(left); buttonTimer.textContent = formatTime(left);
+          } else { buttonTimer.textContent = 'GONE'; }
+        }, 250);
+        document.addEventListener('keydown', event => { if (event.key === 'Escape') overlay.classList.add('hidden'); });
+        const backdrop = document.querySelector('.space-backdrop');
+        if (backdrop) {
+          for (let i=0;i<10;i++) {
+            const ship=document.createElement('i'); ship.className='extra-flyby ship';
+            ship.style.top=`${5+Math.random()*85}%`; ship.style.animationDuration=`${8+Math.random()*10}s`; ship.style.animationDelay=`-${Math.random()*12}s`; ship.style.setProperty('--ship-scale',`${.55+Math.random()*1.2}`); backdrop.appendChild(ship);
+          }
+          for (let i=0;i<7;i++) {
+            const meteor=document.createElement('i'); meteor.className='extra-flyby meteor';
+            meteor.style.top=`${8+Math.random()*78}%`; meteor.style.animationDuration=`${7+Math.random()*9}s`; meteor.style.animationDelay=`-${Math.random()*10}s`; meteor.style.setProperty('--meteor-scale',`${.55+Math.random()*1.3}`); backdrop.appendChild(meteor);
+          }
+        }
+      })();
+    </script>
+    <script src="version8.js"></script>
+    <script src="online.js"></script>
+  </body>
+</html>
